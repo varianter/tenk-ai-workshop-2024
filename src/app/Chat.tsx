@@ -4,15 +4,25 @@ import { Message } from "ai";
 import styles from "./chat.module.css";
 import { useChat } from "ai/react";
 
-export function Chat() {
-  const { messages, input, handleSubmit, handleInputChange, metadata } =
-    useChat({
-      //streamMode: "text",
-      body: { system: "You´re a nice assistant that talks like a pirate" },
-    });
+export function Chat({
+  initialMessages,
+  systemPrompt,
+}: {
+  initialMessages: Message[];
+  systemPrompt: string;
+}) {
+  const { messages, input, handleSubmit, handleInputChange } = useChat({
+    //streamMode: "text",
+    body: {
+      system:
+        systemPrompt ||
+        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions",
+    },
+    initialMessages: initialMessages,
+  });
 
-  console.log(metadata);
-  console.log(messages);
+  console.log("ai messages ", messages);
+  console.log("systemPrompt ", systemPrompt);
 
   return (
     <div className="chat-box">
@@ -30,9 +40,12 @@ function MessageList({ messages }: { messages: Message[] }) {
   return (
     <ul className="message-list">
       {messages.map((message, index) => {
+        if (message.role === "system") {
+          return <></>;
+        }
         return (
           <li
-            key={message.id}
+            key={index}
             className={`message-list-element ${
               message.role === "assistant"
                 ? "message-list-element-chatbot"
