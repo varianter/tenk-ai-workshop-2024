@@ -1,17 +1,27 @@
 "use client";
 
+import { Message } from "ai";
 import styles from "./chat.module.css";
+import { useChat } from "ai/react";
 
-export type Message = {
-  id: string;
-  text: string;
-  senderId: string;
-};
+export function Chat() {
+  const { messages, input, handleSubmit, handleInputChange, metadata } =
+    useChat({
+      //streamMode: "text",
+      body: { system: "You´re a nice assistant that talks like a pirate" },
+    });
 
-export function Chat({ messages }: { messages: Message[] }) {
+  console.log(metadata);
+  console.log(messages);
+
   return (
     <div className="chat-box">
-      <MessageList messages={messages} /> <InputField />
+      <MessageList messages={messages} />{" "}
+      <InputField
+        input={input}
+        handleSubmit={handleSubmit}
+        handleInputChange={handleInputChange}
+      />
     </div>
   );
 }
@@ -24,19 +34,19 @@ function MessageList({ messages }: { messages: Message[] }) {
           <li
             key={message.id}
             className={`message-list-element ${
-              message.senderId === "ChatBot"
+              message.role === "assistant"
                 ? "message-list-element-chatbot"
                 : "message-list-element-reply"
             }`}
           >
             <div
               className={`${
-                message.senderId === "ChatBot"
+                message.role === "assistant"
                   ? "chatbot-message"
                   : "reply-message"
               }`}
             >
-              {message.text}
+              {message.content}
             </div>
           </li>
         );
@@ -45,12 +55,20 @@ function MessageList({ messages }: { messages: Message[] }) {
   );
 }
 
-function InputField() {
+function InputField({
+  input,
+  handleInputChange,
+  handleSubmit,
+}: {
+  input: string;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}) {
   return (
-    <form onSubmit={() => console.log("submit")} className="send-message-form">
+    <form onSubmit={handleSubmit} className="send-message-form">
       <input
-        /*onChange={() => console.log("change")}
-        value={""}*/
+        onChange={handleInputChange}
+        value={input}
         placeholder="Hva lurer du på?"
         type="text"
       />
