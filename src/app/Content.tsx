@@ -10,11 +10,6 @@ export default function Content() {
 
   const systemOptions = [
     {
-      name: "Pirate",
-      prompt:
-        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions. If you don´t know the answer state that you do know know it",
-    },
-    {
       name: "Friendly",
       prompt:
         "You´re a friendly assistant. Check previous messages for answers before answering any questions. If you don´t know the answer state that you do know know it",
@@ -24,16 +19,21 @@ export default function Content() {
       prompt:
         "You´re a grumpy assistant. Check previous messages for answers before answering any questions.",
     },
+    {
+      name: "Pirate",
+      prompt:
+        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions. If you don´t know the answer state that you do know know it",
+    },
   ];
 
   const [systemPrompt, setSystemPrompt] = useState<string>(
-    systemOptions[1].prompt
+    systemOptions[0].prompt
   );
 
   return (
     <main className="main">
       <div className="system-settings-box">
-        <div className="box-with-title">
+        <div className="box-with-title-not-full-height">
           <h2>System settings</h2>
           <div className="system-settings-button-group">
             {systemOptions.map((option) => (

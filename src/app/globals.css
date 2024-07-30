@@ -76,6 +76,14 @@ h2 {
   height: 100%;
 }
 
+.box-with-title-not-full-height {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: fit-content;
+}
+
 /*Containers for chat boxes*/
 
 .chat-box-container {
@@ -88,7 +96,7 @@ h2 {
   align-content: start;
   justify-content: space-between;
   padding: 4px 4px 24px 4px;
-  border: 1px solid var(--off-white);
+  border: 2px solid var(--off-white);
   border-radius: 8px;
   width: 100%;
   /*gap: 16px;*/
@@ -96,6 +104,8 @@ h2 {
 
 .chat-box-system-settings {
   flex-grow: 1;
+  height: 100%;
+  max-height: calc(100vh - 307px);
 }
 
 .chat-box-main-chat {
@@ -184,14 +194,15 @@ h2 {
 }
 
 /*System settings*/
+
 .system-settings-box {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  align-items: center;
-  height: 100%;
+  align-items: flex-start;
+  justify-items: flex-start;
   width: 100%;
-  max-height: calc(100vh - 150px);
+  height: calc(100vh - 50px);
 }
 
 .input-box-message {
@@ -208,6 +219,7 @@ h2 {
   background: var(--secondary-color);
   color: var(--secondary-text-color);
   width: 100%;
+  height: fit-content;
 }
 
 .system-settings-button-group {
@@ -216,6 +228,7 @@ h2 {
   justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
+  height: fit-content;
 }
 
 .system-settings-button {
