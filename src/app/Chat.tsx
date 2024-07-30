@@ -25,7 +25,7 @@ export function Chat({
   console.log("systemPrompt ", systemPrompt);
 
   return (
-    <div className="chat-box">
+    <div className="chat-box chat-box-main-chat">
       <MessageList messages={messages} />{" "}
       <InputField
         input={input}
@@ -38,7 +38,7 @@ export function Chat({
 
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <ul className="message-list">
+    <ul className="message-list ">
       {messages.map((message, index) => {
         if (message.role === "system") {
           return <></>;

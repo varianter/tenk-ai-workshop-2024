@@ -35,7 +35,7 @@ export default function Content() {
       <div className="system-settings-box">
         <div className="box-with-title">
           <h2>System settings</h2>
-          <div className="system-settings-buttons">
+          <div className="system-settings-button-group">
             {systemOptions.map((option) => (
               <button
                 key={option.name}
@@ -53,16 +53,12 @@ export default function Content() {
         </div>
         <div className="box-with-title">
           <h2>Info</h2>
-          <div className="chat-box-container">
-            <SystemInput messages={messages} setMessages={setMessages} />
-          </div>
+          <SystemInput messages={messages} setMessages={setMessages} />
         </div>
       </div>
       <div className="box-with-title">
         <h2>Chat</h2>
-        <div className="chat-box-container">
-          <Chat initialMessages={messages} systemPrompt={systemPrompt} />
-        </div>
+        <Chat initialMessages={messages} systemPrompt={systemPrompt} />
       </div>
     </main>
   );

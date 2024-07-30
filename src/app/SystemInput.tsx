@@ -24,7 +24,7 @@ export default function SystemInput({
   console.log("system messages ", messages);
 
   return (
-    <div className="chat-box">
+    <div className="chat-box  chat-box-system-settings">
       <MessageList messages={messages} />{" "}
       <InputField
         input={input}
