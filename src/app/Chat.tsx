@@ -38,7 +38,7 @@ export function Chat({
 
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <ul className="message-list ">
+    <ul className="message-list">
       {messages.map((message, index) => {
         if (message.role === "system") {
           return <></>;

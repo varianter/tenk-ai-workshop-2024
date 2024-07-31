@@ -129,6 +129,12 @@ h2 {
   scrollbar-color: rgb(251, 250, 247, 0.5) var(--background-color);
 }
 
+.message-list-systemsettings {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .message-list-element {
   display: flex;
   flex-direction: row;

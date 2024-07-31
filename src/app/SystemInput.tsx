@@ -37,7 +37,7 @@ export default function SystemInput({
 
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <ul className="message-list">
+    <ul className="message-list message-list-systemsettings">
       {messages.map((message, index) => {
         return (
           <li key={index} className={`input-box-message`}>
