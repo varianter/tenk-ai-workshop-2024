@@ -1,7 +1,7 @@
 "use client";
 import { Message } from "ai";
-import { useState } from "react";
-import styles from "./styles.module.css"
+import { useEffect, useRef, useState } from "react";
+import styles from "./styles.module.css";
 
 export default function SystemInput({
   messages,
@@ -25,7 +25,7 @@ export default function SystemInput({
   console.log("system messages ", messages);
 
   return (
-    <div className={styles.chatBox} >
+    <div className={styles.chatBox}>
       <MessageList messages={messages} />{" "}
       <InputField
         input={input}
@@ -37,8 +37,21 @@ export default function SystemInput({
 }
 
 function MessageList({ messages }: { messages: Message[] }) {
+  const chatContainerRef = useRef<HTMLUListElement>(null);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
+
   return (
-    <ul className={` ${styles.messageList} `}>
+    <ul className={` ${styles.messageList} `} ref={chatContainerRef}>
       {messages.map((message, index) => {
         return (
           <li key={index} className={styles.inputBoxMessage}>

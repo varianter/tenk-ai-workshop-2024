@@ -3,6 +3,7 @@
 import { Message } from "ai";
 import styles from "./styles.module.css";
 import { useChat } from "ai/react";
+import { useEffect, useRef } from "react";
 
 export function Chat({
   initialMessages,
@@ -37,8 +38,21 @@ export function Chat({
 }
 
 function MessageList({ messages }: { messages: Message[] }) {
+  const chatContainerRef = useRef<HTMLUListElement>(null);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
+
   return (
-    <ul className={styles.messageList}>
+    <ul className={styles.messageList} ref={chatContainerRef}>
       {messages.map((message, index) => {
         if (message.role === "system") {
           return <></>;
