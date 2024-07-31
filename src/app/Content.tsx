@@ -4,16 +4,13 @@ import { useState } from "react";
 import { Chat } from "./Chat";
 import SystemInput from "./SystemInput";
 import { Message } from "ai";
+import styles from "./styles.module.css"
+import SystemSettingButtons from "./SystemSettingButtons";
 
 export default function Content() {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const systemOptions = [
-    {
-      name: "Pirate",
-      prompt:
-        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions. If you don´t know the answer state that you do know know it",
-    },
     {
       name: "Friendly",
       prompt:
@@ -24,46 +21,31 @@ export default function Content() {
       prompt:
         "You´re a grumpy assistant. Check previous messages for answers before answering any questions.",
     },
+    {
+      name: "Pirate",
+      prompt:
+        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions. If you don´t know the answer state that you do know know it",
+    },
   ];
 
   const [systemPrompt, setSystemPrompt] = useState<string>(
-    systemOptions[1].prompt
+    systemOptions[0].prompt
   );
 
   return (
-    <main className="main">
-      <div className="system-settings-box">
-        <div className="box-with-title">
+      <main className={styles.gridWrapper}>
+        <div className={styles.systemSettingsContainer}>
           <h2>System settings</h2>
-          <div className="system-settings-buttons">
-            {systemOptions.map((option) => (
-              <button
-                key={option.name}
-                className={`system-settings-button ${
-                  systemPrompt === option.prompt
-                    ? "system-settings-button-selected"
-                    : ""
-                }`}
-                onClick={() => setSystemPrompt(option.prompt)}
-              >
-                {option.name}
-              </button>
-            ))}
-          </div>
+          <SystemSettingButtons systemOptions={systemOptions} systemPrompt={systemPrompt} setSystemPrompt={setSystemPrompt}/>
         </div>
-        <div className="box-with-title">
+        <div className={styles.inputBoxContainer}>
           <h2>Info</h2>
-          <div className="chat-box-container">
-            <SystemInput messages={messages} setMessages={setMessages} />
-          </div>
+          <SystemInput messages={messages} setMessages={setMessages} />
         </div>
-      </div>
-      <div className="box-with-title">
+      <div className={styles.chatBoxContainer}>
         <h2>Chat</h2>
-        <div className="chat-box-container">
-          <Chat initialMessages={messages} systemPrompt={systemPrompt} />
-        </div>
+        <Chat initialMessages={messages} systemPrompt={systemPrompt} />
       </div>
-    </main>
+      </main>
   );
 }

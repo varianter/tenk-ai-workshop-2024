@@ -1,6 +1,7 @@
 "use client";
 import { Message } from "ai";
 import { useState } from "react";
+import styles from "./styles.module.css"
 
 export default function SystemInput({
   messages,
@@ -24,7 +25,7 @@ export default function SystemInput({
   console.log("system messages ", messages);
 
   return (
-    <div className="chat-box">
+    <div className={styles.chatBox} >
       <MessageList messages={messages} />{" "}
       <InputField
         input={input}
@@ -37,11 +38,11 @@ export default function SystemInput({
 
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <ul className="message-list">
+    <ul className={` ${styles.messageList} `}>
       {messages.map((message, index) => {
         return (
-          <li key={index} className={`input-box-message`}>
-            <div className="input-message">{message.content}</div>
+          <li key={index} className={styles.inputBoxMessage}>
+            <div className={styles.inputMessage}>{message.content}</div>
           </li>
         );
       })}
@@ -59,7 +60,7 @@ function InputField({
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <form onSubmit={handleSubmit} className="send-message-form">
+    <form onSubmit={handleSubmit} className={styles.sendMessageForm}>
       <input
         onChange={handleInputChange}
         value={input}
