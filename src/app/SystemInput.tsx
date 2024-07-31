@@ -55,7 +55,11 @@ function MessageList({ messages }: { messages: Message[] }) {
       {messages.map((message, index) => {
         return (
           <li key={index} className={styles.inputBoxMessage}>
-            <div className={styles.inputMessage}>{message.content}</div>
+            <div className={styles.inputMessage}>
+              <p style={{ whiteSpace: "pre", textWrap: "wrap" }}>
+                {message.content}
+              </p>
+            </div>
           </li>
         );
       })}
