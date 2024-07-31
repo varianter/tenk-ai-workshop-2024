@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Chat } from "./Chat";
 import SystemInput from "./SystemInput";
 import { Message } from "ai";
+import styles from "./styles.module.css"
+import SystemSettingButtons from "./SystemSettingButtons";
 
 export default function Content() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,35 +33,19 @@ export default function Content() {
   );
 
   return (
-    <main className="main">
-      <div className="system-settings-box">
-        <div className="box-with-title-not-full-height">
+      <main className={styles.gridWrapper}>
+        <div className={styles.systemSettingsContainer}>
           <h2>System settings</h2>
-          <div className="system-settings-button-group">
-            {systemOptions.map((option) => (
-              <button
-                key={option.name}
-                className={`system-settings-button ${
-                  systemPrompt === option.prompt
-                    ? "system-settings-button-selected"
-                    : ""
-                }`}
-                onClick={() => setSystemPrompt(option.prompt)}
-              >
-                {option.name}
-              </button>
-            ))}
-          </div>
+          <SystemSettingButtons systemOptions={systemOptions} systemPrompt={systemPrompt} setSystemPrompt={setSystemPrompt}/>
         </div>
-        <div className="box-with-title">
+        <div className={styles.inputBoxContainer}>
           <h2>Info</h2>
           <SystemInput messages={messages} setMessages={setMessages} />
         </div>
-      </div>
-      <div className="box-with-title">
+      <div className={styles.chatBoxContainer}>
         <h2>Chat</h2>
         <Chat initialMessages={messages} systemPrompt={systemPrompt} />
       </div>
-    </main>
+      </main>
   );
 }

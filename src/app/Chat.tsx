@@ -1,7 +1,7 @@
 "use client";
 
 import { Message } from "ai";
-import styles from "./chat.module.css";
+import styles from "./styles.module.css";
 import { useChat } from "ai/react";
 
 export function Chat({
@@ -25,7 +25,7 @@ export function Chat({
   console.log("systemPrompt ", systemPrompt);
 
   return (
-    <div className="chat-box chat-box-main-chat">
+    <div className={styles.chatBox}>
       <MessageList messages={messages} />{" "}
       <InputField
         input={input}
@@ -38,7 +38,7 @@ export function Chat({
 
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <ul className="message-list">
+    <ul className={styles.messageList}>
       {messages.map((message, index) => {
         if (message.role === "system") {
           return <></>;
@@ -46,17 +46,17 @@ function MessageList({ messages }: { messages: Message[] }) {
         return (
           <li
             key={index}
-            className={`message-list-element ${
+            className={`${styles.messageListElement} ${
               message.role === "assistant"
-                ? "message-list-element-chatbot"
-                : "message-list-element-reply"
+                ? styles.messageListElementChatbot
+                : styles.messageListElementReply
             }`}
           >
             <div
               className={`${
                 message.role === "assistant"
-                  ? "chatbot-message"
-                  : "reply-message"
+                  ? styles.chatbotMessage
+                  : styles.replyMessage
               }`}
             >
               {message.content}
@@ -78,7 +78,7 @@ function InputField({
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <form onSubmit={handleSubmit} className="send-message-form">
+    <form onSubmit={handleSubmit} className={styles.sendMessageForm}>
       <input
         onChange={handleInputChange}
         value={input}
