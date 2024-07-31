@@ -4,6 +4,7 @@ import { Message } from "ai";
 import styles from "./styles.module.css";
 import { useChat } from "ai/react";
 import { useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 
 export function Chat({
   initialMessages,
@@ -73,7 +74,7 @@ function MessageList({ messages }: { messages: Message[] }) {
                   : styles.replyMessage
               }`}
             >
-              {message.content}
+              <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
           </li>
         );
