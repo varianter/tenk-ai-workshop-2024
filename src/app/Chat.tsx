@@ -3,36 +3,72 @@
 import { Message } from "ai";
 import styles from "./styles.module.css";
 import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../../db/db.models";
+import { v4 as uuidv4 } from "uuid";
 
 export function Chat({
-  initialMessages,
+  initialMessages: infoMessages,
   systemPrompt,
 }: {
   initialMessages: Message[];
   systemPrompt: string;
 }) {
-  const { messages, input, handleSubmit, handleInputChange } = useChat({
-    //streamMode: "text",
-    body: {
-      system:
-        systemPrompt ||
-        "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions",
-    },
-    initialMessages: initialMessages,
-  });
+  const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
 
-  console.log("ai messages ", messages);
-  console.log("systemPrompt ", systemPrompt);
+  // dexie hook to get live data
+  const dbMessages = useLiveQuery(() => db.messages.toArray()) || [];
+
+  const { messages, input, handleSubmit, handleInputChange, setMessages } =
+    useChat({
+      //streamMode: "text",
+      body: {
+        system:
+          systemPrompt ||
+          "You´re a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions",
+      },
+      onFinish: (message) => {
+        addMessage(message);
+      },
+      initialMessages: dbMessages,
+    });
+
+  useEffect(() => {
+    if (recievedDbMessages || dbMessages.length < 1) return;
+    setMessages(dbMessages);
+    setRecievedDbMessages(true);
+  }, [dbMessages, recievedDbMessages, setMessages]);
+
+  function filterMessages(messages: Message[]) {
+    const uniqueMessagesIds = new Set(messages.map((m) => m.id));
+    return Array.from(uniqueMessagesIds).map(
+      (id) => messages.find((m) => m.id === id) as Message
+    );
+  }
+
+  useEffect(() => {
+    setMessages(filterMessages([...messages, ...infoMessages, ...dbMessages]));
+  }, [infoMessages]);
+
+  const addMessage = useCallback(async (message: Message) => {
+    await db.messages.add({
+      content: message.content,
+      role: message.role,
+      id: message.id,
+      createdAt: message.createdAt || new Date(),
+    });
+  }, []);
 
   return (
     <div className={styles.chatBox}>
-      <MessageList messages={messages} />{" "}
+      <MessageList messages={messages.length ? messages : dbMessages} />
       <InputField
         input={input}
         handleSubmit={handleSubmit}
         handleInputChange={handleInputChange}
+        addMessage={addMessage}
       />
     </div>
   );
@@ -54,31 +90,37 @@ function MessageList({ messages }: { messages: Message[] }) {
 
   return (
     <ul className={styles.messageList} ref={chatContainerRef}>
-      {messages.map((message, index) => {
-        if (message.role === "system") {
-          return <></>;
-        }
-        return (
-          <li
-            key={index}
-            className={`${styles.messageListElement} ${
-              message.role === "assistant"
-                ? styles.messageListElementChatbot
-                : styles.messageListElementReply
-            }`}
-          >
-            <div
-              className={`${
+      {messages
+        .sort(
+          (a, b) =>
+            (a.createdAt || new Date()).getTime() -
+            (b.createdAt || new Date()).getTime()
+        )
+        .map((message, index) => {
+          if (message.role === "system") {
+            return <></>;
+          }
+          return (
+            <li
+              key={index}
+              className={`${styles.messageListElement} ${
                 message.role === "assistant"
-                  ? styles.chatbotMessage
-                  : styles.replyMessage
+                  ? styles.messageListElementChatbot
+                  : styles.messageListElementReply
               }`}
             >
-              <ReactMarkdown>{message.content}</ReactMarkdown>
-            </div>
-          </li>
-        );
-      })}
+              <div
+                className={`${
+                  message.role === "assistant"
+                    ? styles.chatbotMessage
+                    : styles.replyMessage
+                }`}
+              >
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+            </li>
+          );
+        })}
     </ul>
   );
 }
@@ -87,13 +129,26 @@ function InputField({
   input,
   handleInputChange,
   handleSubmit,
+  addMessage,
 }: {
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  addMessage: (message: Message) => void;
 }) {
   return (
-    <form onSubmit={handleSubmit} className={styles.sendMessageForm}>
+    <form
+      onSubmit={(e) => {
+        handleSubmit(e);
+        addMessage({
+          role: "user",
+          id: uuidv4(),
+          content: input,
+          createdAt: new Date(),
+        });
+      }}
+      className={styles.sendMessageForm}
+    >
       <input
         onChange={handleInputChange}
         value={input}
