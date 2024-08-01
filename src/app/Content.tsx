@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Chat } from "./Chat";
 import SystemInput from "./SystemInput";
 import { Message } from "ai";
-import styles from "./styles.module.css"
+import styles from "./styles.module.css";
 import SystemSettingButtons from "./SystemSettingButtons";
 
 export default function Content() {
+  const [infoMessages, setInfoMessages] = useState<Message[]>([]);
+
   const [messages, setMessages] = useState<Message[]>([]);
 
   const systemOptions = [
@@ -33,19 +35,36 @@ export default function Content() {
   );
 
   return (
-      <main className={styles.gridWrapper}>
-        <div className={styles.systemSettingsContainer}>
-          <h2>System settings</h2>
-          <SystemSettingButtons systemOptions={systemOptions} systemPrompt={systemPrompt} setSystemPrompt={setSystemPrompt}/>
-        </div>
-        <div className={styles.inputBoxContainer}>
-          <h2>Info</h2>
-          <SystemInput messages={messages} setMessages={setMessages} />
-        </div>
+    <main className={styles.gridWrapper}>
+      <div className={styles.systemSettingsContainer}>
+        <h2>System settings</h2>
+        <SystemSettingButtons
+          systemOptions={systemOptions}
+          systemPrompt={systemPrompt}
+          setSystemPrompt={setSystemPrompt}
+        />
+      </div>
+      <div className={styles.inputBoxContainer}>
+        <h2>Info</h2>
+        <SystemInput messages={infoMessages} setMessages={setInfoMessages} />
+      </div>
       <div className={styles.chatBoxContainer}>
         <h2>Chat</h2>
-        <Chat initialMessages={messages} systemPrompt={systemPrompt} />
+        <Chat
+          initialMessages={infoMessages}
+          systemPrompt={systemPrompt}
+          setAllMessages={setMessages}
+        />
       </div>
-      </main>
+      <div className={styles.printContainer}>
+        <h2>Print</h2>
+        <div style={{ overflow: "scroll" }}>
+          <h3>System Prompt</h3>
+          <p>{systemPrompt}</p>
+          <h3>Messages</h3>
+          <pre>{JSON.stringify(messages, null, 2)}</pre>
+        </div>
+      </div>
+    </main>
   );
 }

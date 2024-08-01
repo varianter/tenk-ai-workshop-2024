@@ -8,13 +8,16 @@ import ReactMarkdown from "react-markdown";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../db/db.models";
 import { v4 as uuidv4 } from "uuid";
+import { set } from "zod";
 
 export function Chat({
   initialMessages: infoMessages,
   systemPrompt,
+  setAllMessages,
 }: {
   initialMessages: Message[];
   systemPrompt: string;
+  setAllMessages: (messages: Message[]) => void;
 }) {
   const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
 
@@ -31,6 +34,7 @@ export function Chat({
       },
       onFinish: (message) => {
         addMessage(message);
+        setAllMessages(messages);
       },
       initialMessages: dbMessages,
     });
@@ -39,6 +43,7 @@ export function Chat({
     if (recievedDbMessages || dbMessages.length < 1) return;
     setMessages(dbMessages);
     setRecievedDbMessages(true);
+    setAllMessages(dbMessages);
   }, [dbMessages, recievedDbMessages, setMessages]);
 
   function filterMessages(messages: Message[]) {
