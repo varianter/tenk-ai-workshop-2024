@@ -1,7 +1,10 @@
 "use client";
 import { Message } from "ai";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./styles.module.css";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../../db/db.models";
+import { v4 } from "uuid";
 
 export default function SystemInput({
   messages,
@@ -11,6 +14,15 @@ export default function SystemInput({
   setMessages: (messages: Message[]) => void;
 }) {
   const [input, setInput] = useState("");
+  const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
+
+  const dbMessages = useLiveQuery(() => db.messages.toArray()) || [];
+
+  useEffect(() => {
+    if (recievedDbMessages || dbMessages.length < 1) return;
+    setMessages(dbMessages);
+    setRecievedDbMessages(true);
+  }, [dbMessages, recievedDbMessages]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,7 +34,14 @@ export default function SystemInput({
     setInput("");
   };
 
-  console.log("system messages ", messages);
+  const addMessage = useCallback(async (message: Message) => {
+    await db.messages.add({
+      content: message.content,
+      role: message.role,
+      id: message.id,
+      createdAt: message.createdAt || new Date(),
+    });
+  }, []);
 
   return (
     <div className={styles.chatBox}>
@@ -31,6 +50,7 @@ export default function SystemInput({
         input={input}
         handleSubmit={handleSubmit}
         handleInputChange={(e) => setInput(e.target.value)}
+        addMessage={addMessage}
       />
     </div>
   );
@@ -52,17 +72,19 @@ function MessageList({ messages }: { messages: Message[] }) {
 
   return (
     <ul className={` ${styles.messageList} `} ref={chatContainerRef}>
-      {messages.map((message, index) => {
-        return (
-          <li key={index} className={styles.inputBoxMessage}>
-            <div className={styles.inputMessage}>
-              <p style={{ whiteSpace: "pre", textWrap: "wrap" }}>
-                {message.content}
-              </p>
-            </div>
-          </li>
-        );
-      })}
+      {messages
+        .filter((message) => message.role == "system")
+        .map((message, index) => {
+          return (
+            <li key={index} className={styles.inputBoxMessage}>
+              <div className={styles.inputMessage}>
+                <p style={{ whiteSpace: "pre", textWrap: "wrap" }}>
+                  {message.content}
+                </p>
+              </div>
+            </li>
+          );
+        })}
     </ul>
   );
 }
@@ -71,13 +93,26 @@ function InputField({
   input,
   handleInputChange,
   handleSubmit,
+  addMessage,
 }: {
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  addMessage: (message: Message) => void;
 }) {
   return (
-    <form onSubmit={handleSubmit} className={styles.sendMessageForm}>
+    <form
+      onSubmit={(e) => {
+        handleSubmit(e);
+        addMessage({
+          role: "system",
+          content: input,
+          id: v4(),
+          createdAt: new Date(),
+        });
+      }}
+      className={styles.sendMessageForm}
+    >
       <input
         onChange={handleInputChange}
         value={input}
