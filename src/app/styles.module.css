@@ -129,8 +129,8 @@
   border: 1px solid var(--off-white);
   border-radius: 4px;
   font-weight: 200;
-  background-color: var(--background-color);
-  color: var(--main-text-color);
+  background-color: var(--secondary-color);
+  color: var(--secondary-text-color);
   font-family: "Graphik-Medium";
 }
 
@@ -139,8 +139,8 @@
 }
 
 .sendMessageForm input::placeholder {
-  color: var(--off-white);
-  opacity: 1;
+  color: var(--secondary-text-color);
+  opacity: 0.5;
 }
 
 /*######### SYSTEM INPUT CHAT #######*/
