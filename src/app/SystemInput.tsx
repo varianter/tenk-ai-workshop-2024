@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./styles.module.css";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../db/db.models";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
+
+const inputMessageStart = `Teksten nedenfor frem til "KONTEKST SLUTT" er informasjon gitt til bakgrunn for spørsmål og kommentarer brukeren kommer med. Du skal ta utgangspunkt i den informasjonen når du svarer. \n`;
+
+const inputMessageEnd = `\n KONTEKST SLUTT`;
 
 export default function SystemInput({
   messages,
@@ -26,10 +30,16 @@ export default function SystemInput({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessages([
-      ...messages,
-      { content: input, role: "system", id: messages.length.toString() },
-    ]);
+
+    const newMessage: Message = {
+      content: inputMessageStart + input + inputMessageEnd,
+      role: "system",
+      id: uuidv4(),
+      createdAt: new Date(),
+    };
+    setMessages([...messages, newMessage]);
+
+    addMessage(newMessage);
 
     setInput("");
   };
@@ -50,7 +60,6 @@ export default function SystemInput({
         input={input}
         handleSubmit={handleSubmit}
         handleInputChange={(e) => setInput(e.target.value)}
-        addMessage={addMessage}
       />
     </div>
   );
@@ -70,16 +79,20 @@ function MessageList({ messages }: { messages: Message[] }) {
     scrollToBottom();
   }, [scrollToBottom]);
 
+  function removeSytstemPrompt(content: string) {
+    return content.replace(inputMessageStart, "").replace(inputMessageEnd, "");
+  }
+
   return (
     <ul className={` ${styles.messageList} `} ref={chatContainerRef}>
       {messages
         .filter((message) => message.role == "system")
-        .map((message, index) => {
+        .map((message) => {
           return (
-            <li key={index} className={styles.inputBoxMessage}>
+            <li key={message.id} className={styles.inputBoxMessage}>
               <div className={styles.inputMessage}>
                 <p style={{ whiteSpace: "pre", textWrap: "wrap" }}>
-                  {message.content}
+                  {removeSytstemPrompt(message.content)}
                 </p>
               </div>
             </li>
@@ -93,23 +106,15 @@ function InputField({
   input,
   handleInputChange,
   handleSubmit,
-  addMessage,
 }: {
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  addMessage: (message: Message) => void;
 }) {
   return (
     <form
       onSubmit={(e) => {
         handleSubmit(e);
-        addMessage({
-          role: "system",
-          content: input,
-          id: v4(),
-          createdAt: new Date(),
-        });
       }}
       className={styles.sendMessageForm}
     >

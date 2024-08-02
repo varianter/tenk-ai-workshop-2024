@@ -12,21 +12,27 @@ export default function Content() {
 
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const [lastMessage, setLastMessage] = useState<Message | null>(null);
+
+  //Check previous messages for answers before answering any questions. If you don't know the answer state that you do know know it
+
+  //const baseSystemPrompt = `Ta utgangspunkt i informasjonen gitt i system meldinger markert med "KONTEKST START" for å svare på spørsmål og kommentarer brukeren kommer med. Hvis du ikke vet svaret si at dette vet du ikke, men at brukeren kan legge inn infoen i boksen til venstre. Svar på samme språk som brukeren bruker  \n`;
+
+  const baseSystemPrompt = `Take the information given in system messages marked with "CONTEXT START" as a basis for answering questions and comments the user comes with. If you do not know the answer, say that you do not know, but that the user can enter the information in the box to the left. Answer in the same language as the user uses \n`;
+
   const systemOptions = [
     {
       name: "Friendly",
-      prompt:
-        "You're a friendly assistant. Check previous messages for answers before answering any questions. If you don't know the answer state that you do know know it",
+      prompt: "You're a friendly assistant. " + baseSystemPrompt,
     },
     {
       name: "Grumpy",
-      prompt:
-        "You're a grumpy assistant. Check previous messages for answers before answering any questions.",
+      prompt: "You're a grumpy assistant. " + baseSystemPrompt,
     },
     {
       name: "Pirate",
       prompt:
-        "You're a nice assistant that talks like a pirate. Check previous messages for answers before answering any questions. If you don't know the answer state that you do know know it",
+        "You're a nice assistant that talks like a pirate. " + baseSystemPrompt,
     },
   ];
 
@@ -54,15 +60,24 @@ export default function Content() {
           initialMessages={infoMessages}
           systemPrompt={systemPrompt}
           setAllMessages={setMessages}
+          setLastMessage={setLastMessage}
         />
       </div>
       <div className={styles.printContainer}>
         <h2>Print</h2>
         <div style={{ overflow: "scroll" }}>
-          <h3>System Prompt</h3>
-          <p>{systemPrompt}</p>
-          <h3>Messages</h3>
-          <pre>{JSON.stringify(messages, null, 2)}</pre>
+          <h3>Sendt</h3>
+          <pre style={{ whiteSpace: "pre" }}>
+            {JSON.stringify(
+              [{ content: systemPrompt, role: "system", id: "0" }, ...messages],
+              null,
+              2
+            )}
+          </pre>
+          <h3>Mottatt</h3>
+          <pre style={{ whiteSpace: "pre" }}>
+            {JSON.stringify(lastMessage, null, 2)}
+          </pre>
         </div>
       </div>
     </main>

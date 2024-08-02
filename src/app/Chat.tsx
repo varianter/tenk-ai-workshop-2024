@@ -8,16 +8,17 @@ import ReactMarkdown from "react-markdown";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../db/db.models";
 import { v4 as uuidv4 } from "uuid";
-import { set } from "zod";
 
 export function Chat({
   initialMessages: infoMessages,
   systemPrompt,
   setAllMessages,
+  setLastMessage,
 }: {
   initialMessages: Message[];
   systemPrompt: string;
   setAllMessages: (messages: Message[]) => void;
+  setLastMessage: (message: Message | null) => void;
 }) {
   const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
 
@@ -34,7 +35,7 @@ export function Chat({
       },
       onFinish: (message) => {
         addMessage(message);
-        setAllMessages(messages);
+        setLastMessage(message);
       },
       initialMessages: dbMessages,
     });
@@ -54,7 +55,8 @@ export function Chat({
   }
 
   useEffect(() => {
-    setMessages(filterMessages([...messages, ...infoMessages, ...dbMessages]));
+    setMessages(filterMessages([...messages, ...infoMessages]));
+    setAllMessages(filterMessages([...messages, ...infoMessages]));
   }, [infoMessages]);
 
   const addMessage = useCallback(async (message: Message) => {
@@ -74,6 +76,8 @@ export function Chat({
         handleSubmit={handleSubmit}
         handleInputChange={handleInputChange}
         addMessage={addMessage}
+        setAllMessages={setAllMessages}
+        messages={messages}
       />
     </div>
   );
@@ -96,18 +100,16 @@ function MessageList({ messages }: { messages: Message[] }) {
   return (
     <ul className={styles.messageList} ref={chatContainerRef}>
       {messages
+        .filter((m) => m.role !== "system")
         .sort(
           (a, b) =>
             (a.createdAt || new Date()).getTime() -
             (b.createdAt || new Date()).getTime()
         )
-        .map((message, index) => {
-          if (message.role === "system") {
-            return <></>;
-          }
+        .map((message) => {
           return (
             <li
-              key={index}
+              key={message.id}
               className={`${styles.messageListElement} ${
                 message.role === "assistant"
                   ? styles.messageListElementChatbot
@@ -135,22 +137,28 @@ function InputField({
   handleInputChange,
   handleSubmit,
   addMessage,
+  setAllMessages,
+  messages,
 }: {
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   addMessage: (message: Message) => void;
+  setAllMessages: (messages: Message[]) => void;
+  messages: Message[];
 }) {
   return (
     <form
       onSubmit={(e) => {
         handleSubmit(e);
-        addMessage({
+        const newMessage: Message = {
           role: "user",
           id: uuidv4(),
           content: input,
           createdAt: new Date(),
-        });
+        };
+        addMessage(newMessage);
+        setAllMessages([...messages, newMessage]);
       }}
       className={styles.sendMessageForm}
     >
