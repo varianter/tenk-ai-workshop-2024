@@ -6,6 +6,8 @@ import SystemInput from "./SystemInput";
 import { Message } from "ai";
 import styles from "./styles.module.css";
 import SystemSettingButtons from "./SystemSettingButtons";
+import ExtraInfo from "./ExtraInfo";
+import Image from "next/image";
 
 export default function Content() {
   const [infoMessages, setInfoMessages] = useState<Message[]>([]);
@@ -14,11 +16,13 @@ export default function Content() {
 
   const [lastMessage, setLastMessage] = useState<Message | null>(null);
 
+  const [showExtraInfo, setShowExtraInfo] = useState<boolean>(false);
+
   //Check previous messages for answers before answering any questions. If you don't know the answer state that you do know know it
 
   //const baseSystemPrompt = `Ta utgangspunkt i informasjonen gitt i system meldinger markert med "KONTEKST START" for å svare på spørsmål og kommentarer brukeren kommer med. Hvis du ikke vet svaret si at dette vet du ikke, men at brukeren kan legge inn infoen i boksen til venstre. Svar på samme språk som brukeren bruker  \n`;
 
-  const baseSystemPrompt = `Take the information given in system messages marked with "CONTEXT START" as a basis for answering questions and comments the user comes with. If you do not know the answer, say that you do not know, but that the user can enter the information in the box to the left. Answer in the same language as the user uses \n`;
+  const baseSystemPrompt = `Take the information given in system messages marked with "CONTEXT START" as a basis for answering questions and comments the user comes with. If you can't find the answer there search your existing knowledge base. If you do not know the answer, say that you do not know, but that the user can enter the information in the box to the left. Answer in the same language as the last message from the user \n`;
 
   const systemOptions = [
     {
@@ -64,21 +68,36 @@ export default function Content() {
         />
       </div>
       <div className={styles.printContainer}>
-        <h2>Print</h2>
-        <div style={{ overflow: "scroll" }}>
-          <h3>Sendt</h3>
-          <pre style={{ whiteSpace: "pre" }}>
-            {JSON.stringify(
-              [{ content: systemPrompt, role: "system", id: "0" }, ...messages],
-              null,
-              2
+        <div className={styles.accordionHeader}>
+          <h2>JSON-Struktur</h2>{" "}
+          <button
+            onClick={() => setShowExtraInfo(!showExtraInfo)}
+            className={styles.accordionButton}
+          >
+            {showExtraInfo ? (
+              <Image
+                src={"/chevron-down.svg"}
+                alt={"Skjul"}
+                style={{ rotate: "180deg" }}
+                width={24}
+                height={24}
+              />
+            ) : (
+              <Image
+                src={"/chevron-down.svg"}
+                alt={"Vis"}
+                width={24}
+                height={24}
+              />
             )}
-          </pre>
-          <h3>Mottatt</h3>
-          <pre style={{ whiteSpace: "pre" }}>
-            {JSON.stringify(lastMessage, null, 2)}
-          </pre>
+          </button>
         </div>
+        <ExtraInfo
+          messages={messages}
+          lastMessage={lastMessage}
+          systemPrompt={systemPrompt}
+          showExtraInfo={showExtraInfo}
+        />
       </div>
     </main>
   );
