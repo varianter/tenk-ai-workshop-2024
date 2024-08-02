@@ -81,7 +81,7 @@ function MessageList({ messages }: { messages: Message[] }) {
     scrollToBottom();
   }, [scrollToBottom]);
 
-  function removeSytstemPrompt(content: string) {
+  function removeSystemPrompt(content: string) {
     return content.replace(inputMessageStart, "").replace(inputMessageEnd, "");
   }
 
@@ -94,7 +94,7 @@ function MessageList({ messages }: { messages: Message[] }) {
             <li key={message.id} className={styles.inputBoxMessage}>
               <div className={styles.inputMessage}>
                 <p style={{ whiteSpace: "pre", textWrap: "wrap" }}>
-                  {removeSytstemPrompt(message.content)}
+                  {removeSystemPrompt(message.content)}
                 </p>
               </div>
             </li>
