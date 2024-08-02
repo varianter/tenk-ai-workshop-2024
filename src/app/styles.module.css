@@ -199,4 +199,43 @@
   pointer-events: none;
 }
 
+/*######### JSON OBJEKTER ###########*/
+.extraInfoContainer {
+  display: grid;
+  overflow: hidden;
+  grid-template-rows: auto 1fr auto 3fr;
+  min-width: 0;
+  border: 2px solid var(--off-white);
+  border-radius: 8px;
+  padding: 12px 24px;
+}
+
+.extraInfo {
+  white-space: pre;
+  overflow: auto;
+  background-color: var(--code-background-color);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.accordionHeader {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+}
+
+.accordionButton {
+  padding: 2px;
+  background-color: var(--secondary-color);
+  color: var(--secondary-text-color);
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /*########### END ############*/
