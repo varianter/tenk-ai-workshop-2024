@@ -6,9 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../db/db.models";
 import { v4 as uuidv4 } from "uuid";
 
-//const inputMessageStart = `Teksten nedenfor frem til "KONTEKST SLUTT" er informasjon gitt til bakgrunn for spørsmål og kommentarer brukeren kommer med. Du skal ta utgangspunkt i den informasjonen når du svarer. \n`;
-
-const inputMessageStart = `"CONTEXT START" The text below until "CONTEXT END" is information given as background for questions and comments from the user. Base your answers on this information \n`;
+const inputMessageStart = `CONTEXT START The text below until "CONTEXT END" is information given as background for questions and comments from the user. Base your answers on this information \n`;
 
 const inputMessageEnd = `\n CONTEXT END`;
 

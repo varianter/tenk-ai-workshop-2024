@@ -22,6 +22,8 @@ export function Chat({
 }) {
   const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
 
+  const [error, setError] = useState<boolean>(false);
+
   // dexie hook to get live data
   const dbMessages = useLiveQuery(() => db.messages.toArray()) || [];
 
@@ -38,6 +40,9 @@ export function Chat({
         setLastMessage(message);
       },
       initialMessages: dbMessages,
+      onError: (error) => {
+        console.log("Error", error), setError(true);
+      },
     });
 
   useEffect(() => {
@@ -70,6 +75,12 @@ export function Chat({
 
   return (
     <div className={styles.chatBox}>
+      {error ? (
+        <p className={styles.error}>
+          Det har skjedd en feil. Vent litt, og prøv på nytt. Hvis feilen
+          fortsetter spør en veileder om hjelp
+        </p>
+      ) : null}
       <MessageList messages={messages.length ? messages : dbMessages} />
       <InputField
         input={input}
@@ -78,6 +89,7 @@ export function Chat({
         addMessage={addMessage}
         setAllMessages={setAllMessages}
         messages={messages}
+        setError={setError}
       />
     </div>
   );
@@ -139,6 +151,7 @@ function InputField({
   addMessage,
   setAllMessages,
   messages,
+  setError,
 }: {
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -146,6 +159,7 @@ function InputField({
   addMessage: (message: Message) => void;
   setAllMessages: (messages: Message[]) => void;
   messages: Message[];
+  setError: (error: boolean) => void;
 }) {
   return (
     <form
@@ -159,6 +173,7 @@ function InputField({
         };
         addMessage(newMessage);
         setAllMessages([...messages, newMessage]);
+        setError(false);
       }}
       className={styles.sendMessageForm}
     >
