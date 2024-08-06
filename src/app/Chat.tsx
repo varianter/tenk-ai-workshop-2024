@@ -55,9 +55,13 @@ export function Chat({
 
   function filterMessages(messages: Message[]) {
     const uniqueMessagesIds = new Set(messages.map((m) => m.id));
-    return Array.from(uniqueMessagesIds).map(
-      (id) => messages.find((m) => m.id === id) as Message
-    );
+    return Array.from(uniqueMessagesIds)
+      .map((id) => messages.find((m) => m.id === id) as Message)
+      .sort(
+        (a, b) =>
+          (a.createdAt || new Date()).getTime() -
+          (b.createdAt || new Date()).getTime()
+      );
   }
 
   useEffect(() => {
