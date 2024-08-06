@@ -3,8 +3,8 @@ import Dexie, { Table } from "dexie";
 // table inteface
 export interface Message {
   id: string;
-  content: string;
   role: "system" | "user" | "assistant" | "function" | "data" | "tool";
+  content: string;
   createdAt: Date;
 }
 

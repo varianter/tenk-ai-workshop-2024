@@ -1,6 +1,6 @@
 import { Message } from "ai";
 import styles from "./styles.module.css";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function ExtraInfo({
   messages,
@@ -13,6 +13,19 @@ export default function ExtraInfo({
   systemPrompt: string;
   showExtraInfo: boolean;
 }) {
+  const chatContainerRef = useRef<HTMLPreElement>(null);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
+
   return (
     <>
       {showExtraInfo ? (
@@ -26,9 +39,16 @@ export default function ExtraInfo({
             <p className={styles.extraInfo}>Ingen melding mottatt</p>
           )}
           <h3>Hva som sist ble sendt til ChatBoten</h3>
-          <pre className={styles.extraInfo}>
+          <pre className={styles.extraInfo} ref={chatContainerRef}>
             {JSON.stringify(
-              [{ content: systemPrompt, role: "system", id: "0" }, ...messages],
+              [
+                { content: systemPrompt, role: "system", id: "0" },
+                ...messages.sort(
+                  (a, b) =>
+                    (a.createdAt || new Date()).getTime() -
+                    (b.createdAt || new Date()).getTime()
+                ),
+              ],
               null,
               2
             )}

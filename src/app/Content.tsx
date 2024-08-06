@@ -31,7 +31,9 @@ export default function Content() {
     },
     {
       name: "Grumpy",
-      prompt: "You're a grumpy assistant. " + baseSystemPrompt,
+      prompt:
+        "You're a grumpy assistant, that acts annoyed with every question you get. " +
+        baseSystemPrompt,
     },
     {
       name: "Pirate",

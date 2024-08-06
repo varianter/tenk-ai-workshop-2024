@@ -1,5 +1,5 @@
 import { azure } from "@ai-sdk/azure";
-import { CoreMessage, generateText, streamText } from "ai";
+import { CoreMessage, streamText } from "ai";
 
 export async function POST(req: Request) {
   const { messages, system }: { messages: CoreMessage[]; system: string } =

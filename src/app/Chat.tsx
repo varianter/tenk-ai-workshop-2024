@@ -30,6 +30,7 @@ export function Chat({
   const { messages, input, handleSubmit, handleInputChange, setMessages } =
     useChat({
       //streamMode: "text",
+      keepLastMessageOnError: true,
       body: {
         system:
           systemPrompt ||
@@ -66,9 +67,9 @@ export function Chat({
 
   const addMessage = useCallback(async (message: Message) => {
     await db.messages.add({
-      content: message.content,
-      role: message.role,
       id: message.id,
+      role: message.role,
+      content: message.content,
       createdAt: message.createdAt || new Date(),
     });
   }, []);
@@ -166,8 +167,8 @@ function InputField({
       onSubmit={(e) => {
         handleSubmit(e);
         const newMessage: Message = {
-          role: "user",
           id: uuidv4(),
+          role: "user",
           content: input,
           createdAt: new Date(),
         };

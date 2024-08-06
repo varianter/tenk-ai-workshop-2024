@@ -20,7 +20,10 @@ export default function SystemInput({
   const [input, setInput] = useState("");
   const [recievedDbMessages, setRecievedDbMessages] = useState<boolean>(false);
 
-  const dbMessages = useLiveQuery(() => db.messages.toArray()) || [];
+  const dbMessages =
+    useLiveQuery(() =>
+      db.messages.where("role").equalsIgnoreCase("system").toArray()
+    ) || [];
 
   useEffect(() => {
     if (recievedDbMessages || dbMessages.length < 1) return;
@@ -32,9 +35,9 @@ export default function SystemInput({
     e.preventDefault();
 
     const newMessage: Message = {
-      content: inputMessageStart + input + inputMessageEnd,
-      role: "system",
       id: uuidv4(),
+      role: "system",
+      content: inputMessageStart + input + inputMessageEnd,
       createdAt: new Date(),
     };
     setMessages([...messages, newMessage]);
@@ -46,9 +49,9 @@ export default function SystemInput({
 
   const addMessage = useCallback(async (message: Message) => {
     await db.messages.add({
-      content: message.content,
-      role: message.role,
       id: message.id,
+      role: message.role,
+      content: message.content,
       createdAt: message.createdAt || new Date(),
     });
   }, []);
@@ -87,6 +90,11 @@ function MessageList({ messages }: { messages: Message[] }) {
     <ul className={` ${styles.messageList} `} ref={chatContainerRef}>
       {messages
         .filter((message) => message.role == "system")
+        .sort(
+          (a, b) =>
+            (a.createdAt || new Date()).getTime() -
+            (b.createdAt || new Date()).getTime()
+        )
         .map((message) => {
           return (
             <li key={message.id} className={styles.inputBoxMessage}>
